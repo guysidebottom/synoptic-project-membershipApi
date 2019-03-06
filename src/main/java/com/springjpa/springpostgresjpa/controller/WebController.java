@@ -1,51 +1,64 @@
 package com.springjpa.springpostgresjpa.controller;
 
 import com.springjpa.springpostgresjpa.model.Employee;
+import com.springjpa.springpostgresjpa.repository.ConsumableRepository;
+import com.springjpa.springpostgresjpa.repository.EmployeeCardRepository;
 import com.springjpa.springpostgresjpa.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class WebController {
 
     @Autowired
-    EmployeeRepository repository;
+    EmployeeRepository employeeRepository;
+    @Autowired
+    EmployeeCardRepository employeeCardRepository;
+    @Autowired
+    ConsumableRepository consumableRepository;
 
-    @RequestMapping("/save")
-    public String process() {
-        repository.save(new Employee("Guy", "Sidebottom", 908098, 9809));
-
-        return "Done";
+    // Employee CRUD methods
+    // GET employee by id
+    @RequestMapping(value = "/employee/{id}", method = RequestMethod.GET)
+    public String findById(@PathVariable Long id) {
+        String result = "";
+        result += employeeRepository.findById(id).toString();
+        return result;
     }
 
-    @RequestMapping("/findall")
-    public String findAll() {
+    // GET employee by name
+    @RequestMapping(value = "/employee/name", method = RequestMethod.GET)
+    public String findByName(@RequestParam ("name") String name) {
         String result = "";
-
-        for(Employee employee : repository.findAll()) {
-            result += employee.toString() + "<br>";
-        }
+        result += employeeRepository.findByName(name);
 
         return result;
     }
 
-    @RequestMapping("findbyid")
-    public String findById(@RequestParam("id") long id) {
-        String result = "";
-        result = repository.findById(id).toString();
-        return result;
+    // create a new employee
+    @RequestMapping(value = "/employee", method = RequestMethod.POST)
+    public Employee newEmployee(@RequestBody Employee newEmployee) {
+        return employeeRepository.save(newEmployee);
     }
 
-    @RequestMapping("/findbyemail")
-    public String findByEmailAddress(@RequestParam("email") String email) {
-        String result = "";
-
-        for(Employee employee : repository.findByEmailAddress(email)) {
-            result += employee.toString() + "<br>";
-        }
-
-        return result;
+    // replace an existing employee
+    @RequestMapping(value = "/employee/update/{id}", method = RequestMethod.PUT)
+    public Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
+        return employeeRepository.findById(id)
+                .map(employee -> {
+                    employee.setName(newEmployee.getName());
+                    employee.setEmailAddress(newEmployee.getEmailAddress());
+                    employee.setPhoneNumber(newEmployee.getPhoneNumber());
+                    employee.setPinNumber(newEmployee.getPinNumber());
+                    return employeeRepository.save(newEmployee);
+                })
+                .orElseGet(() -> {
+                    newEmployee.setId(id);
+                    return employeeRepository.save(newEmployee);
+                });
     }
+
+    // EmployeeCard CRUD methods
+
+
 }
