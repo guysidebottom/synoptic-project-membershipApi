@@ -1,7 +1,7 @@
 package com.springjpa.springpostgresjpa.controller;
 
-import com.springjpa.springpostgresjpa.model.StaffMember;
-import com.springjpa.springpostgresjpa.model.StaffRepository;
+import com.springjpa.springpostgresjpa.model.Employee;
+import com.springjpa.springpostgresjpa.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebController {
 
     @Autowired
-    StaffRepository repository;
+    EmployeeRepository repository;
 
     @RequestMapping("/save")
     public String process() {
-        repository.save(new StaffMember("Guy", "Sidebottom"));
+        repository.save(new Employee("Guy", "Sidebottom", 908098, 9809));
 
         return "Done";
     }
@@ -24,8 +24,8 @@ public class WebController {
     public String findAll() {
         String result = "";
 
-        for(StaffMember staff : repository.findAll()) {
-            result += staff.toString() + "<br>";
+        for(Employee employee : repository.findAll()) {
+            result += employee.toString() + "<br>";
         }
 
         return result;
@@ -38,12 +38,12 @@ public class WebController {
         return result;
     }
 
-    @RequestMapping("/findbylastname")
-    public String findByLastName(@RequestParam("lastname") String lastName) {
+    @RequestMapping("/findbyemail")
+    public String findByEmailAddress(@RequestParam("email") String email) {
         String result = "";
 
-        for(StaffMember staff : repository.findByLastName(lastName)) {
-            result += staff.toString() + "<br>";
+        for(Employee employee : repository.findByEmailAddress(email)) {
+            result += employee.toString() + "<br>";
         }
 
         return result;

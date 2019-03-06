@@ -1,6 +1,6 @@
 package com.springjpa.springpostgresjpa;
 
-import com.springjpa.springpostgresjpa.model.StaffRepository;
+import com.springjpa.springpostgresjpa.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SpringPostgresJpaApplication implements CommandLineRunner {
 
 	@Autowired
-    StaffRepository repository;
+	EmployeeRepository repository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringPostgresJpaApplication.class, args);
