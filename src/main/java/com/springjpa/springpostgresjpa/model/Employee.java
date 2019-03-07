@@ -25,13 +25,17 @@ public class Employee implements Serializable {
     @Column(name = "pin_number")
     private int pinNumber;
 
+    @Column(name = "card_number")
+    private int cardNumber;
+
     protected Employee(){}
 
-    public Employee(String name, String emailAddress, int phoneNumber, int pinNumber) {
+    public Employee(String name, String emailAddress, int phoneNumber, int pinNumber, int cardNumber) {
         this.name = name;
         this.emailAddress = emailAddress;
         this.phoneNumber = phoneNumber;
         this.pinNumber = pinNumber;
+        this.cardNumber = cardNumber;
 
     }
 

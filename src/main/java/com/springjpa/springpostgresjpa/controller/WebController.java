@@ -1,6 +1,7 @@
 package com.springjpa.springpostgresjpa.controller;
 
 import com.springjpa.springpostgresjpa.model.Employee;
+import com.springjpa.springpostgresjpa.model.EmployeeCard;
 import com.springjpa.springpostgresjpa.repository.ConsumableRepository;
 import com.springjpa.springpostgresjpa.repository.EmployeeCardRepository;
 import com.springjpa.springpostgresjpa.repository.EmployeeRepository;
@@ -59,6 +60,9 @@ public class WebController {
     }
 
     // EmployeeCard CRUD methods
-
+    @RequestMapping(value = "/employeecard/{cardnumber}", method = RequestMethod.POST)
+    public EmployeeCard newEmployeeCard(@RequestBody EmployeeCard employeeCard, @PathVariable int cardNumber) {
+        return employeeCardRepository.save(employeeCard);
+    }
 
 }
