@@ -1,5 +1,7 @@
 package com.springjpa.springpostgresjpa.model;
 
+import com.springjpa.springpostgresjpa.exception.EntityCreationException;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -31,6 +33,14 @@ public class Employee implements Serializable {
     protected Employee(){}
 
     public Employee(String name, String emailAddress, int phoneNumber, int pinNumber, int cardNumber) {
+        if(name == null || emailAddress == null || phoneNumber == 0 || pinNumber == 0 || cardNumber == 0) {
+            throw new EntityCreationException("Field can not be null %s",
+                    name,
+                    emailAddress,
+                    phoneNumber,
+                    pinNumber,
+                    cardNumber);
+        }
         this.name = name;
         this.emailAddress = emailAddress;
         this.phoneNumber = phoneNumber;

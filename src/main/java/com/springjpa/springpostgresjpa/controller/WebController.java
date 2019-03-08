@@ -1,5 +1,6 @@
 package com.springjpa.springpostgresjpa.controller;
 
+import com.springjpa.springpostgresjpa.model.Consumable;
 import com.springjpa.springpostgresjpa.model.Employee;
 import com.springjpa.springpostgresjpa.model.EmployeeCard;
 import com.springjpa.springpostgresjpa.repository.ConsumableRepository;
@@ -21,7 +22,7 @@ public class WebController {
     // Employee CRUD methods
     // GET employee by id
     @RequestMapping(value = "/employee/{id}", method = RequestMethod.GET)
-    public String findById(@PathVariable Long id) {
+    public String findEmployeeById(@PathVariable Long id) {
         String result = "";
         result += employeeRepository.findById(id).toString();
         return result;
@@ -29,7 +30,7 @@ public class WebController {
 
     // GET employee by name
     @RequestMapping(value = "/employee/name", method = RequestMethod.GET)
-    public String findByName(@RequestParam ("name") String name) {
+    public String findEmployeeByName(@RequestParam ("name") String name) {
         String result = "";
         result += employeeRepository.findByName(name);
 
@@ -60,9 +61,32 @@ public class WebController {
     }
 
     // EmployeeCard CRUD methods
+    // Create new employeeCard
     @RequestMapping(value = "/employeecard/{cardnumber}", method = RequestMethod.POST)
     public EmployeeCard newEmployeeCard(@RequestBody EmployeeCard employeeCard, @PathVariable int cardNumber) {
         return employeeCardRepository.save(employeeCard);
     }
 
+    // GET employee card by id
+    @RequestMapping(value = "/employeecard/{id}", method = RequestMethod.GET)
+    public String findCardById(@PathVariable Long id) {
+        String result = "";
+        result += employeeCardRepository.findById(id).toString();
+        return result;
+    }
+
+    // Consumable CRUD methods
+    // Create new consumable
+    @RequestMapping(value = "/consumable", method = RequestMethod.POST)
+    public Consumable newConsumable(@RequestBody Consumable consumable) {
+        return consumableRepository.save(consumable);
+    }
+
+    // GET consumable by id
+    @RequestMapping(value = "/consumable/{name}", method = RequestMethod.GET)
+    public String findConsumableById(@PathVariable String name) {
+        String result = "";
+        result += consumableRepository.findById(name).toString();
+        return result;
+    }
 }
