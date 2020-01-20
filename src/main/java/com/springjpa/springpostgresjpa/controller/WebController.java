@@ -1,12 +1,12 @@
 package com.springjpa.springpostgresjpa.controller;
 
-import com.springjpa.springpostgresjpa.model.Consumable;
+import com.springjpa.springpostgresjpa.exception.EntityCreationException;
 import com.springjpa.springpostgresjpa.model.Employee;
 import com.springjpa.springpostgresjpa.model.EmployeeCard;
-import com.springjpa.springpostgresjpa.repository.ConsumableRepository;
 import com.springjpa.springpostgresjpa.repository.EmployeeCardRepository;
 import com.springjpa.springpostgresjpa.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,12 +16,11 @@ public class WebController {
     EmployeeRepository employeeRepository;
     @Autowired
     EmployeeCardRepository employeeCardRepository;
-    @Autowired
-    ConsumableRepository consumableRepository;
 
     // Employee CRUD methods
     // GET employee by id
     @RequestMapping(value = "/employee/{id}", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Invalid ID")
     public String findEmployeeById(@PathVariable Long id) {
         String result = "";
         result += employeeRepository.findById(id).toString();
@@ -39,16 +38,20 @@ public class WebController {
 
     // create a new employee
     @RequestMapping(value = "/employee", method = RequestMethod.POST)
-    public Employee newEmployee(@RequestBody Employee newEmployee) {
+    public Employee newEmployee(@RequestBody Employee newEmployee) throws EntityCreationException {
+        if(newEmployee.getCardId() == null) {
+            throw new EntityCreationException();
+        }
         return employeeRepository.save(newEmployee);
     }
 
     // replace an existing employee
     @RequestMapping(value = "/employee/update/{id}", method = RequestMethod.PUT)
-    public Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
+    public Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable long id) {
         return employeeRepository.findById(id)
                 .map(employee -> {
                     employee.setName(newEmployee.getName());
+                    employee.setCardId(newEmployee.getCardId());
                     employee.setEmailAddress(newEmployee.getEmailAddress());
                     employee.setPhoneNumber(newEmployee.getPhoneNumber());
                     employee.setPinNumber(newEmployee.getPinNumber());
@@ -72,21 +75,6 @@ public class WebController {
     public String findCardById(@PathVariable Long id) {
         String result = "";
         result += employeeCardRepository.findById(id).toString();
-        return result;
-    }
-
-    // Consumable CRUD methods
-    // Create new consumable
-    @RequestMapping(value = "/consumable", method = RequestMethod.POST)
-    public Consumable newConsumable(@RequestBody Consumable consumable) {
-        return consumableRepository.save(consumable);
-    }
-
-    // GET consumable by id
-    @RequestMapping(value = "/consumable/{name}", method = RequestMethod.GET)
-    public String findConsumableById(@PathVariable String name) {
-        String result = "";
-        result += consumableRepository.findById(name).toString();
         return result;
     }
 }
