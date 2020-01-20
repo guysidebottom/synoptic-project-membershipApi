@@ -15,11 +15,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class EmployeeTest {
 
+    private String cardId = "r7jTG7dqBy5wGO4L";
     private String name = "someName";
     private String emailAddress = "some@email.address";
     private int phoneNumber = 123456;
     private int pinNumber = 1234;
-    private int cardNumber = 123456;
 
     @Mock
     private EmployeeRepository mockEmployeeRepository;
@@ -29,7 +29,7 @@ public class EmployeeTest {
 
     @Before
     public void setUp() {
-        mockEmployee = new Employee(name, emailAddress, phoneNumber, pinNumber, cardNumber);
+        mockEmployee = new Employee(cardId, name, emailAddress, phoneNumber, pinNumber);
     }
 
     @Test
@@ -40,8 +40,9 @@ public class EmployeeTest {
     }
 
     @Test(expected = EntityCreationException.class)
-    public void shouldNotCreateEmployeeWhenNameIsNullException() {
-        mockEmployeeRepository.save(new Employee(null, emailAddress, phoneNumber, pinNumber, cardNumber));
+    public void shouldNotCreateEmployeeWhenCardIdIsInvalid() {
+        mockEmployee.setCardId("Invalid");
+        mockEmployeeRepository.save(mockEmployee);
     }
 
     @Test
@@ -50,7 +51,6 @@ public class EmployeeTest {
         assertThat(mockEmployee.getName()).isNotNull();
         assertThat(mockEmployee.getEmailAddress()).isEqualTo("some@email.address");
         assertThat(mockEmployee.getPhoneNumber()).isEqualTo(123456);
-
     }
 
 

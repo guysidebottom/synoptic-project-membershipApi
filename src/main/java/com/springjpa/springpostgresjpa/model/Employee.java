@@ -59,14 +59,14 @@ public class Employee implements Serializable {
     }
 
 // Ensure that staff ID's conform to alphanumeric pattern upto 16 chars long
-    public ResponseEntity<Object> setCardId(String newId) {
+    public ResponseEntity<Object> setCardId(String newId) throws EntityCreationException {
         String nameRegex = "([a-zA-Z0-9])\\w{15}";
 
         if(newId.matches(nameRegex)) {
             this.cardId = newId;
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        else return new ResponseEntity<>((HttpStatus.BAD_REQUEST));
+        throw new EntityCreationException();
    }
 
     public String getName() {
