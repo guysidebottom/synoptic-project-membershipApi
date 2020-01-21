@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "employee")
-public class Employee implements Serializable {
+public class EmployeeEntity implements Serializable {
 
     private static final long serialVersionUID = 123456L;
 
@@ -35,9 +35,12 @@ public class Employee implements Serializable {
     @Column(name = "pin_number")
     private int pinNumber;
 
-    protected Employee(){}
+    @Column(name = "balance")
+    private double balance;
 
-    public Employee(String cardId, String name, String emailAddress, int phoneNumber, int pinNumber) {
+    protected EmployeeEntity(){}
+
+    public EmployeeEntity(String cardId, String name, String emailAddress, int phoneNumber, int pinNumber) {
         if(cardId == null || name == null || emailAddress == null || phoneNumber == 0 || pinNumber == 0) {
             throw new EntityCreationException("Field can not be null %s",
                     id,
@@ -52,6 +55,7 @@ public class Employee implements Serializable {
         this.emailAddress = emailAddress;
         this.phoneNumber = phoneNumber;
         this.pinNumber = pinNumber;
+        this.balance = 0.0;
     }
 
     public Long id() {

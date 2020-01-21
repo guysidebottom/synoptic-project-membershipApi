@@ -1,7 +1,7 @@
 package com.springjpa.springpostgresjpa;
 
 import com.springjpa.springpostgresjpa.exception.EntityCreationException;
-import com.springjpa.springpostgresjpa.model.Employee;
+import com.springjpa.springpostgresjpa.model.EmployeeEntity;
 import com.springjpa.springpostgresjpa.repository.EmployeeRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,18 +25,18 @@ public class EmployeeTest {
     private EmployeeRepository mockEmployeeRepository;
 
     @Mock
-    private Employee mockEmployee;
+    private EmployeeEntity mockEmployee;
 
     @Before
     public void setUp() {
-        mockEmployee = new Employee(cardId, name, emailAddress, phoneNumber, pinNumber);
+        mockEmployee = new EmployeeEntity(cardId, name, emailAddress, phoneNumber, pinNumber);
     }
 
     @Test
     public void shouldSaveNewEmployee() {
 
         mockEmployeeRepository.save(mockEmployee);
-        verify(mockEmployeeRepository, times(1)).save(any(Employee.class));
+        verify(mockEmployeeRepository, times(1)).save(any(EmployeeEntity.class));
     }
 
     @Test(expected = EntityCreationException.class)

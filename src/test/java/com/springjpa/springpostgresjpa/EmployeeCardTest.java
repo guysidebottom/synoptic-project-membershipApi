@@ -1,10 +1,8 @@
 package com.springjpa.springpostgresjpa;
 
 import com.springjpa.springpostgresjpa.exception.EntityCreationException;
-import com.springjpa.springpostgresjpa.model.Employee;
 import com.springjpa.springpostgresjpa.model.EmployeeCard;
 import com.springjpa.springpostgresjpa.repository.EmployeeCardRepository;
-import com.springjpa.springpostgresjpa.repository.EmployeeRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
