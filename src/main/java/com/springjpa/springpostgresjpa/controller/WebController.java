@@ -3,9 +3,7 @@ package com.springjpa.springpostgresjpa.controller;
 import com.springjpa.springpostgresjpa.exception.EntityCreationException;
 import com.springjpa.springpostgresjpa.exception.RecordNotFoundException;
 import com.springjpa.springpostgresjpa.model.EmployeeEntity;
-import com.springjpa.springpostgresjpa.model.EmployeeCard;
 import com.springjpa.springpostgresjpa.model.EmployeeService;
-import com.springjpa.springpostgresjpa.repository.EmployeeCardRepository;
 import com.springjpa.springpostgresjpa.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -29,10 +27,22 @@ public class WebController {
     @RequestMapping(value = "/welcome/{cardId}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     public String welcomePage(@PathVariable String cardId) throws RecordNotFoundException {
         EmployeeEntity employee = service.getEmployeeByCardId(cardId);
-        if(employee.getCardId().isEmpty()) {
+        if (employee.getCardId().isEmpty()) {
             return new RecordNotFoundException("Unregistered card").toString();
         }
-        return String.format("Welcome %s", employee.getName());
+        return String.format("Welcome to First Catering %s", employee.getName());
+    }
+
+    // Authentication
+    @RequestMapping(value = "/employee/auth", method = RequestMethod.GET)
+    public String employeeAuthentication(@RequestParam int pinNumber, String cardId) throws RecordNotFoundException {
+        EmployeeEntity employee = service.getEmployeeByCardId(cardId);
+        if (employee.getPinNumber() == pinNumber) {
+            employee.setLoggedIn(true);
+            employeeRepository.save(employee);
+            return String.format("Success! You are logged into First Catering %s", employee.getName());
+        }
+        return "Sorry your PIN number is invalid. Please try again.";
     }
 
     // GET employee by id
@@ -44,7 +54,7 @@ public class WebController {
 
     // GET employee card by id
     @RequestMapping(value = "/employeecard/cardId", method = RequestMethod.GET)
-    public ResponseEntity<EmployeeEntity> findCardById(@RequestParam ("card_id") String cardId) throws RecordNotFoundException {
+    public ResponseEntity<EmployeeEntity> findCardById(@RequestParam("card_id") String cardId) throws RecordNotFoundException {
         EmployeeEntity employee = service.getEmployeeByCardId(cardId);
         return new ResponseEntity<>(employee, new HttpHeaders(), HttpStatus.OK);
     }
@@ -52,7 +62,7 @@ public class WebController {
     // create a new employee
     @RequestMapping(value = "/employee", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     public EmployeeEntity newEmployee(@RequestBody EmployeeEntity newEmployee) throws EntityCreationException {
-        if(newEmployee.getCardId() == null) {
+        if (newEmployee.getCardId() == null) {
             throw new EntityCreationException();
         }
         return employeeRepository.save(newEmployee);
@@ -74,6 +84,13 @@ public class WebController {
                     newEmployee.setId(id);
                     return employeeRepository.save(newEmployee);
                 });
+    }
+
+    @RequestMapping(value = "/employee/balance/{cardId}", method = RequestMethod.PUT)
+    public EmployeeEntity topUpBalance(@RequestBody double amount, @PathVariable String cardId) throws RecordNotFoundException {
+        EmployeeEntity employee = service.topUpBalance(cardId, amount);
+        return employeeRepository.save(employee);
+
     }
 
 }

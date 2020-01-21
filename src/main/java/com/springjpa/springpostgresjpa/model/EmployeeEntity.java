@@ -1,9 +1,6 @@
 package com.springjpa.springpostgresjpa.model;
 
 import com.springjpa.springpostgresjpa.exception.EntityCreationException;
-import javafx.beans.binding.ObjectExpression;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -38,10 +35,13 @@ public class EmployeeEntity implements Serializable {
     @Column(name = "balance")
     private double balance;
 
-    protected EmployeeEntity(){}
+    private boolean isLoggedIn = false;
+
+    protected EmployeeEntity() {
+    }
 
     public EmployeeEntity(String cardId, String name, String emailAddress, int phoneNumber, int pinNumber) {
-        if(cardId == null || name == null || emailAddress == null || phoneNumber == 0 || pinNumber == 0) {
+        if (cardId == null || name == null || emailAddress == null || phoneNumber == 0 || pinNumber == 0) {
             throw new EntityCreationException("Field can not be null %s",
                     id,
                     cardId,
@@ -58,20 +58,26 @@ public class EmployeeEntity implements Serializable {
         this.balance = 0.0;
     }
 
-    public Long id() {
-        return id;
-    }
-
-// Ensure that staff ID's conform to alphanumeric pattern upto 16 chars long
-    public ResponseEntity<Object> setCardId(String newId) throws EntityCreationException {
+    // Ensure that staff ID's conform to alphanumeric pattern upto 16 chars long
+    public void setCardId(String newId) throws EntityCreationException {
         String nameRegex = "([a-zA-Z0-9])\\w{15}";
 
-        if(newId.matches(nameRegex)) {
+        if (newId.matches(nameRegex)) {
             this.cardId = newId;
-            return new ResponseEntity<>(HttpStatus.OK);
         }
         throw new EntityCreationException();
-   }
+    }
+
+    // emails must conform to email pattern with an '@'
+    public void setEmailAddress(String emailAddress) {
+        String emailRegex = "^(.+)@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher = pattern.matcher(emailAddress);
+
+        if (matcher.matches()) {
+            this.emailAddress = emailAddress;
+        } else throw new EntityCreationException("Invalid email format");
+    }
 
     public String getName() {
         return name;
@@ -83,18 +89,6 @@ public class EmployeeEntity implements Serializable {
 
     public String getEmailAddress() {
         return emailAddress;
-    }
-// emails must conform to email pattern with an '@'
-    public ResponseEntity<Object> setEmailAddress(String emailAddress) {
-        String emailRegex = "^(.+)@(.+)$";
-        Pattern pattern = Pattern.compile(emailRegex);
-        Matcher matcher = pattern.matcher(emailRegex);
-
-        if(matcher.matches()){
-            this.emailAddress = emailAddress;
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public int getPhoneNumber() {
@@ -113,6 +107,26 @@ public class EmployeeEntity implements Serializable {
         this.pinNumber = pinNumber;
     }
 
+    public String getCardId() {
+        return this.cardId;
+    }
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        isLoggedIn = loggedIn;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance += balance;
+    }
+
     @Override
     public String toString() {
         return "Employee{" +
@@ -123,10 +137,6 @@ public class EmployeeEntity implements Serializable {
                 ", phoneNumber=" + phoneNumber +
                 ", pinNumber=" + pinNumber +
                 '}';
-    }
-
-    public String getCardId() {
-        return this.cardId;
     }
 
     public void setId(long id) {
