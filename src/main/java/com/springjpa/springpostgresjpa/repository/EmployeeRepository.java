@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface EmployeeRepository extends CrudRepository<EmployeeEntity, Long> {
+public interface EmployeeRepository extends CrudRepository<EmployeeEntity, Integer> {
     Optional<EmployeeEntity> findByCardId(String cardId);
 }

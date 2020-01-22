@@ -18,8 +18,7 @@ public class WebController {
 
     @Autowired
     EmployeeRepository employeeRepository;
-    @Autowired
-    EmployeeCardRepository employeeCardRepository;
+
     @Autowired
     EmployeeService service;
 
@@ -28,7 +27,7 @@ public class WebController {
     public String welcomePage(@PathVariable String cardId) throws RecordNotFoundException {
         EmployeeEntity employee = service.getEmployeeByCardId(cardId);
         if (employee.getCardId().isEmpty()) {
-            return new RecordNotFoundException("Unregistered card").toString();
+            throw new RecordNotFoundException("Card is not registered. Please register to use this service");
         }
         return String.format("Welcome to First Catering %s", employee.getName());
     }
@@ -47,7 +46,7 @@ public class WebController {
 
     // GET employee by id
     @RequestMapping(value = "/employee/{id}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeEntity> findEmployeeById(@PathVariable Long id) throws RecordNotFoundException {
+    public ResponseEntity<EmployeeEntity> findEmployeeById(@PathVariable int id) throws RecordNotFoundException {
         EmployeeEntity employee = service.getEmployeeById(id);
         return new ResponseEntity<>(employee, new HttpHeaders(), HttpStatus.OK);
     }
@@ -70,7 +69,7 @@ public class WebController {
 
     // replace an existing employee
     @RequestMapping(value = "/employee/update/{id}", method = RequestMethod.PUT)
-    public EmployeeEntity replaceEmployee(@RequestBody EmployeeEntity newEmployee, @PathVariable long id) {
+    public EmployeeEntity replaceEmployee(@RequestBody EmployeeEntity newEmployee, @PathVariable int id) {
         return employeeRepository.findById(id)
                 .map(employee -> {
                     employee.setName(newEmployee.getName());
@@ -90,7 +89,6 @@ public class WebController {
     public EmployeeEntity topUpBalance(@RequestBody double amount, @PathVariable String cardId) throws RecordNotFoundException {
         EmployeeEntity employee = service.topUpBalance(cardId, amount);
         return employeeRepository.save(employee);
-
     }
 
 }

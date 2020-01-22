@@ -14,7 +14,7 @@ public class EmployeeService {
     @Autowired
     EmployeeRepository repository;
 
-    public EmployeeEntity getEmployeeById(Long id) throws RecordNotFoundException {
+    public EmployeeEntity getEmployeeById(int id) throws RecordNotFoundException {
         Optional<EmployeeEntity> employee = repository.findById(id);
 
         if (employee.isPresent()) {
@@ -30,7 +30,7 @@ public class EmployeeService {
         if (employee.isPresent()) {
             return employee.get();
         } else {
-            throw new RecordNotFoundException(String.format("No employee record exist for given card id %s", cardId));
+            throw new RecordNotFoundException(String.format("No employee record exist for given card id %s. Please register to use this service", cardId));
         }
     }
 
@@ -49,5 +49,9 @@ public class EmployeeService {
         } else {
             throw new RecordNotFoundException(String.format("No employee record exist for given card id %s", cardId));
         }
+    }
+
+    public void setRepository(EmployeeRepository repository) {
+        this.repository = repository;
     }
 }

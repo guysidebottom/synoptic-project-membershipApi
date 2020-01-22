@@ -15,7 +15,7 @@ public class EmployeeEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    private int id;
 
     @Column(name = "card_id")
     private String cardId;
@@ -27,7 +27,7 @@ public class EmployeeEntity implements Serializable {
     private String emailAddress;
 
     @Column(name = "phone_number")
-    private int phoneNumber;
+    private String phoneNumber;
 
     @Column(name = "pin_number")
     private int pinNumber;
@@ -40,8 +40,8 @@ public class EmployeeEntity implements Serializable {
     protected EmployeeEntity() {
     }
 
-    public EmployeeEntity(String cardId, String name, String emailAddress, int phoneNumber, int pinNumber) {
-        if (cardId == null || name == null || emailAddress == null || phoneNumber == 0 || pinNumber == 0) {
+    public EmployeeEntity(int id, String cardId, String name, String emailAddress, String phoneNumber, int pinNumber) {
+        if (cardId == "" || name == "" || emailAddress == "" || phoneNumber == "" || pinNumber == 0) {
             throw new EntityCreationException("Field can not be null %s",
                     id,
                     cardId,
@@ -65,7 +65,7 @@ public class EmployeeEntity implements Serializable {
         if (newId.matches(nameRegex)) {
             this.cardId = newId;
         }
-        throw new EntityCreationException();
+        else throw new EntityCreationException();
     }
 
     // emails must conform to email pattern with an '@'
@@ -91,11 +91,11 @@ public class EmployeeEntity implements Serializable {
         return emailAddress;
     }
 
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
