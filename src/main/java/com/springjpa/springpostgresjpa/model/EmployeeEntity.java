@@ -41,7 +41,7 @@ public class EmployeeEntity implements Serializable {
     }
 
     public EmployeeEntity(int id, String cardId, String name, String emailAddress, String phoneNumber, int pinNumber) {
-        if (cardId == "" || name == "" || emailAddress == "" || phoneNumber == "" || pinNumber == 0) {
+        if (cardId.equals("")  || name.equals("") || emailAddress.equals("") || phoneNumber.equals("") || pinNumber == 0) {
             throw new EntityCreationException("Field can not be null %s",
                     id,
                     cardId,
@@ -64,8 +64,7 @@ public class EmployeeEntity implements Serializable {
 
         if (newId.matches(nameRegex)) {
             this.cardId = newId;
-        }
-        else throw new EntityCreationException();
+        } else throw new EntityCreationException("Not a valid card ID. Must be alphanumeric 16 characters long");
     }
 
     // emails must conform to email pattern with an '@'
@@ -104,7 +103,10 @@ public class EmployeeEntity implements Serializable {
     }
 
     public void setPinNumber(int pinNumber) {
-        this.pinNumber = pinNumber;
+        int pinLength = String.valueOf(pinNumber).length();
+        if (pinLength == 4) {
+            this.pinNumber = pinNumber;
+        } else throw new EntityCreationException("PIN must be 4 digits long");
     }
 
     public String getCardId() {

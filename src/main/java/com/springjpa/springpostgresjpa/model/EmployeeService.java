@@ -51,6 +51,11 @@ public class EmployeeService {
         }
     }
 
+    public boolean isRegistered(String cardId) {
+        Optional<EmployeeEntity> employee = repository.findByCardId(cardId);
+        return employee.isPresent();
+    }
+
     public void setRepository(EmployeeRepository repository) {
         this.repository = repository;
     }

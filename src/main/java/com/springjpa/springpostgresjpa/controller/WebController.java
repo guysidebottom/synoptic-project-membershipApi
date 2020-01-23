@@ -52,17 +52,17 @@ public class WebController {
     }
 
     // GET employee card by id
-    @RequestMapping(value = "/employeecard/cardId", method = RequestMethod.GET)
+    @RequestMapping(value = "/employee/cardId", method = RequestMethod.GET)
     public ResponseEntity<EmployeeEntity> findCardById(@RequestParam("card_id") String cardId) throws RecordNotFoundException {
         EmployeeEntity employee = service.getEmployeeByCardId(cardId);
         return new ResponseEntity<>(employee, new HttpHeaders(), HttpStatus.OK);
     }
 
     // create a new employee
-    @RequestMapping(value = "/employee", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/employee/register", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     public EmployeeEntity newEmployee(@RequestBody EmployeeEntity newEmployee) throws EntityCreationException {
-        if (newEmployee.getCardId() == null) {
-            throw new EntityCreationException();
+        if (service.isRegistered(newEmployee.getCardId())) {
+            throw new EntityCreationException("User already registered.");
         }
         return employeeRepository.save(newEmployee);
     }
@@ -85,7 +85,7 @@ public class WebController {
                 });
     }
 
-    @RequestMapping(value = "/employee/balance/{cardId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/employee/topup/{cardId}", method = RequestMethod.PUT)
     public EmployeeEntity topUpBalance(@RequestBody double amount, @PathVariable String cardId) throws RecordNotFoundException {
         EmployeeEntity employee = service.topUpBalance(cardId, amount);
         return employeeRepository.save(employee);
