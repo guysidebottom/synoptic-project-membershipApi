@@ -1,9 +1,6 @@
 package com.springjpa.springpostgresjpa.model;
 
 import com.springjpa.springpostgresjpa.exception.EntityCreationException;
-import javafx.beans.binding.ObjectExpression;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,13 +9,13 @@ import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "employee")
-public class Employee implements Serializable {
+public class EmployeeEntity implements Serializable {
 
     private static final long serialVersionUID = 123456L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    private int id;
 
     @Column(name = "card_id")
     private String cardId;
@@ -30,15 +27,21 @@ public class Employee implements Serializable {
     private String emailAddress;
 
     @Column(name = "phone_number")
-    private int phoneNumber;
+    private String phoneNumber;
 
     @Column(name = "pin_number")
     private int pinNumber;
 
-    protected Employee(){}
+    @Column(name = "balance")
+    private double balance;
 
-    public Employee(String cardId, String name, String emailAddress, int phoneNumber, int pinNumber) {
-        if(cardId == null || name == null || emailAddress == null || phoneNumber == 0 || pinNumber == 0) {
+    private boolean isLoggedIn = false;
+
+    protected EmployeeEntity() {
+    }
+
+    public EmployeeEntity(int id, String cardId, String name, String emailAddress, String phoneNumber, int pinNumber) {
+        if (cardId.equals("")  || name.equals("") || emailAddress.equals("") || phoneNumber.equals("") || pinNumber == 0) {
             throw new EntityCreationException("Field can not be null %s",
                     id,
                     cardId,
@@ -52,22 +55,28 @@ public class Employee implements Serializable {
         this.emailAddress = emailAddress;
         this.phoneNumber = phoneNumber;
         this.pinNumber = pinNumber;
+        this.balance = 0.0;
     }
 
-    public Long id() {
-        return id;
-    }
-
-// Ensure that staff ID's conform to alphanumeric pattern upto 16 chars long
-    public ResponseEntity<Object> setCardId(String newId) throws EntityCreationException {
+    // Ensure that staff ID's conform to alphanumeric pattern upto 16 chars long
+    public void setCardId(String newId) throws EntityCreationException {
         String nameRegex = "([a-zA-Z0-9])\\w{15}";
 
-        if(newId.matches(nameRegex)) {
+        if (newId.matches(nameRegex)) {
             this.cardId = newId;
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        throw new EntityCreationException();
-   }
+        } else throw new EntityCreationException("Not a valid card ID. Must be alphanumeric 16 characters long");
+    }
+
+    // emails must conform to email pattern with an '@'
+    public void setEmailAddress(String emailAddress) {
+        String emailRegex = "^(.+)@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher = pattern.matcher(emailAddress);
+
+        if (matcher.matches()) {
+            this.emailAddress = emailAddress;
+        } else throw new EntityCreationException("Invalid email format");
+    }
 
     public String getName() {
         return name;
@@ -80,24 +89,12 @@ public class Employee implements Serializable {
     public String getEmailAddress() {
         return emailAddress;
     }
-// emails must conform to email pattern with an '@'
-    public ResponseEntity<Object> setEmailAddress(String emailAddress) {
-        String emailRegex = "^(.+)@(.+)$";
-        Pattern pattern = Pattern.compile(emailRegex);
-        Matcher matcher = pattern.matcher(emailRegex);
 
-        if(matcher.matches()){
-            this.emailAddress = emailAddress;
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -106,7 +103,30 @@ public class Employee implements Serializable {
     }
 
     public void setPinNumber(int pinNumber) {
-        this.pinNumber = pinNumber;
+        int pinLength = String.valueOf(pinNumber).length();
+        if (pinLength == 4) {
+            this.pinNumber = pinNumber;
+        } else throw new EntityCreationException("PIN must be 4 digits long");
+    }
+
+    public String getCardId() {
+        return this.cardId;
+    }
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        isLoggedIn = loggedIn;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance += balance;
     }
 
     @Override
@@ -119,10 +139,6 @@ public class Employee implements Serializable {
                 ", phoneNumber=" + phoneNumber +
                 ", pinNumber=" + pinNumber +
                 '}';
-    }
-
-    public String getCardId() {
-        return this.cardId;
     }
 
     public void setId(long id) {

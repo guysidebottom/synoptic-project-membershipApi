@@ -1,12 +1,10 @@
 package com.springjpa.springpostgresjpa.repository;
 
-import com.springjpa.springpostgresjpa.model.Employee;
+import com.springjpa.springpostgresjpa.model.EmployeeEntity;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface EmployeeRepository extends CrudRepository<Employee, Long> {
-    List<Employee> findByEmailAddress(String email);
-    String findByName(String name);
-
+public interface EmployeeRepository extends CrudRepository<EmployeeEntity, Integer> {
+    Optional<EmployeeEntity> findByCardId(String cardId);
 }

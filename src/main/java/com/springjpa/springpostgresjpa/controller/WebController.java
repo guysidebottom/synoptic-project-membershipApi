@@ -1,53 +1,75 @@
 package com.springjpa.springpostgresjpa.controller;
 
 import com.springjpa.springpostgresjpa.exception.EntityCreationException;
-import com.springjpa.springpostgresjpa.model.Employee;
-import com.springjpa.springpostgresjpa.model.EmployeeCard;
-import com.springjpa.springpostgresjpa.repository.EmployeeCardRepository;
+import com.springjpa.springpostgresjpa.exception.RecordNotFoundException;
+import com.springjpa.springpostgresjpa.model.EmployeeEntity;
+import com.springjpa.springpostgresjpa.model.EmployeeService;
 import com.springjpa.springpostgresjpa.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 public class WebController {
 
     @Autowired
     EmployeeRepository employeeRepository;
-    @Autowired
-    EmployeeCardRepository employeeCardRepository;
 
-    // Employee CRUD methods
-    // GET employee by id
-    @RequestMapping(value = "/employee/{id}", method = RequestMethod.GET)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Invalid ID")
-    public String findEmployeeById(@PathVariable Long id) {
-        String result = "";
-        result += employeeRepository.findById(id).toString();
-        return result;
+    @Autowired
+    EmployeeService service;
+
+    // Welcome page
+    @RequestMapping(value = "/welcome/{cardId}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    public String welcomePage(@PathVariable String cardId) throws RecordNotFoundException {
+        EmployeeEntity employee = service.getEmployeeByCardId(cardId);
+        if (employee.getCardId().isEmpty()) {
+            throw new RecordNotFoundException("Card is not registered. Please register to use this service");
+        }
+        return String.format("Welcome to First Catering %s", employee.getName());
     }
 
-    // GET employee by name
-    @RequestMapping(value = "/employee/name", method = RequestMethod.GET)
-    public String findEmployeeByName(@RequestParam ("name") String name) {
-        String result = "";
-        result += employeeRepository.findByName(name);
+    // Authentication
+    @RequestMapping(value = "/employee/auth", method = RequestMethod.GET)
+    public String employeeAuthentication(@RequestParam int pinNumber, String cardId) throws RecordNotFoundException {
+        EmployeeEntity employee = service.getEmployeeByCardId(cardId);
+        if (employee.getPinNumber() == pinNumber) {
+            employee.setLoggedIn(true);
+            employeeRepository.save(employee);
+            return String.format("Success! You are logged into First Catering %s", employee.getName());
+        }
+        return "Sorry your PIN number is invalid. Please try again.";
+    }
 
-        return result;
+    // GET employee by id
+    @RequestMapping(value = "/employee/{id}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeEntity> findEmployeeById(@PathVariable int id) throws RecordNotFoundException {
+        EmployeeEntity employee = service.getEmployeeById(id);
+        return new ResponseEntity<>(employee, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    // GET employee card by id
+    @RequestMapping(value = "/employee/cardId", method = RequestMethod.GET)
+    public ResponseEntity<EmployeeEntity> findCardById(@RequestParam("card_id") String cardId) throws RecordNotFoundException {
+        EmployeeEntity employee = service.getEmployeeByCardId(cardId);
+        return new ResponseEntity<>(employee, new HttpHeaders(), HttpStatus.OK);
     }
 
     // create a new employee
-    @RequestMapping(value = "/employee", method = RequestMethod.POST)
-    public Employee newEmployee(@RequestBody Employee newEmployee) throws EntityCreationException {
-        if(newEmployee.getCardId() == null) {
-            throw new EntityCreationException();
+    @RequestMapping(value = "/employee/register", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
+    public EmployeeEntity newEmployee(@RequestBody EmployeeEntity newEmployee) throws EntityCreationException {
+        if (service.isRegistered(newEmployee.getCardId())) {
+            throw new EntityCreationException("User already registered.");
         }
         return employeeRepository.save(newEmployee);
     }
 
     // replace an existing employee
     @RequestMapping(value = "/employee/update/{id}", method = RequestMethod.PUT)
-    public Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable long id) {
+    public EmployeeEntity replaceEmployee(@RequestBody EmployeeEntity newEmployee, @PathVariable int id) {
         return employeeRepository.findById(id)
                 .map(employee -> {
                     employee.setName(newEmployee.getName());
@@ -63,18 +85,10 @@ public class WebController {
                 });
     }
 
-    // EmployeeCard CRUD methods
-    // Create new employeeCard
-    @RequestMapping(value = "/employeecard/{cardnumber}", method = RequestMethod.POST)
-    public EmployeeCard newEmployeeCard(@RequestBody EmployeeCard employeeCard, @PathVariable int cardNumber) {
-        return employeeCardRepository.save(employeeCard);
+    @RequestMapping(value = "/employee/topup/{cardId}", method = RequestMethod.PUT)
+    public EmployeeEntity topUpBalance(@RequestBody double amount, @PathVariable String cardId) throws RecordNotFoundException {
+        EmployeeEntity employee = service.topUpBalance(cardId, amount);
+        return employeeRepository.save(employee);
     }
 
-    // GET employee card by id
-    @RequestMapping(value = "/employeecard/{id}", method = RequestMethod.GET)
-    public String findCardById(@PathVariable Long id) {
-        String result = "";
-        result += employeeCardRepository.findById(id).toString();
-        return result;
-    }
 }

@@ -9,16 +9,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SpringPostgresJpaApplication implements CommandLineRunner {
 
-	@Autowired
-	EmployeeRepository repository;
+    @Autowired
+    EmployeeRepository repository;
 
-	public static void main(String[] args) {
-		SpringApplication.run(SpringPostgresJpaApplication.class, args);
-	}
-
-	@Override
-    public void run(String... arg0) throws Exception {
-	    repository.deleteAll();
+    public static void main(String[] args) {
+        SpringApplication.run(SpringPostgresJpaApplication.class, args);
     }
 
+    @Override
+    public void run(String... args) throws Exception {
+
+    }
 }
