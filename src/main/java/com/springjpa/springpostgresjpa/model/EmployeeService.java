@@ -55,7 +55,7 @@ public class EmployeeService {
         Optional<EmployeeEntity> employee = repository.findByCardId(cardId);
         return employee.isPresent();
     }
-
+// Used only for unit testing purposes where we want to make use of a mock repo
     public void setRepository(EmployeeRepository repository) {
         this.repository = repository;
     }
